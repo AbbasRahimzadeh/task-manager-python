@@ -1,15 +1,16 @@
-        list_frame = tk.Frame(self.root, bg=self.bg_color)
-        list_frame.pack(pady=15, padx=20, fill=tk.BOTH, expand=True)
+        btn_frame = tk.Frame(self.root, bg=self.bg_color)
+        btn_frame.pack(pady=(0, 20), padx=20, fill=tk.X)
 
-        scrollbar = tk.Scrollbar(list_frame)
-        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
-
-        self.task_listbox = tk.Listbox(
-            list_frame, font=("Tahoma", 11), bg=self.card_color,
-            fg=self.text_color, selectbackground="#334155",
-            selectforeground="white", relief=tk.FLAT, bd=0,
-            highlightthickness=0, yscrollcommand=scrollbar.set,
-            justify="right"
+        self.complete_btn = tk.Button(
+            btn_frame, text="تغییر وضعیت (انجام شد / نشد) ✔", command=self.toggle_task,
+            bg=self.success_color, fg="white", font=("Tahoma", 10, "bold"),
+            relief=tk.FLAT, pady=8, cursor="hand2"
         )
-        self.task_listbox.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-        scrollbar.config(command=self.task_listbox.yview)
+        self.complete_btn.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(5, 0))
+
+        self.delete_btn = tk.Button(
+            btn_frame, text="حذف وظیفه 🗑", command=self.delete_task,
+            bg=self.danger_color, fg="white", font=("Tahoma", 10, "bold"),
+            relief=tk.FLAT, pady=8, cursor="hand2"
+        )
+        self.delete_btn.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
