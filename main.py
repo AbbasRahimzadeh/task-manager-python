@@ -1,16 +1,53 @@
-        btn_frame = tk.Frame(self.root, bg=self.bg_color)
-        btn_frame.pack(pady=(0, 20), padx=20, fill=tk.X)
+ def load_tasks(self):
+        if os.path.exists(FILENAME):
+            with open(FILENAME, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return []
 
-        self.complete_btn = tk.Button(
-            btn_frame, text="تغییر وضعیت (انجام شد / نشد) ✔", command=self.toggle_task,
-            bg=self.success_color, fg="white", font=("Tahoma", 10, "bold"),
-            relief=tk.FLAT, pady=8, cursor="hand2"
-        )
-        self.complete_btn.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(5, 0))
+    def save_tasks(self):
+        with open(FILENAME, "w", encoding="utf-8") as f:
+            json.dump(self.tasks, f, ensure_ascii=False, indent=4)
 
-        self.delete_btn = tk.Button(
-            btn_frame, text="حذف وظیفه 🗑", command=self.delete_task,
-            bg=self.danger_color, fg="white", font=("Tahoma", 10, "bold"),
-            relief=tk.FLAT, pady=8, cursor="hand2"
-        )
-        self.delete_btn.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+    def refresh_listbox(self):
+        self.task_listbox.delete(0, tk.END)
+        for idx, task in enumerate(self.tasks):
+            status_icon = "✅" if task["completed"] else "⏳"
+            display_text = f" {task['title']}  {status_icon} "
+            self.task_listbox.insert(tk.END, display_text)
+            if task["completed"]:
+                self.task_listbox.itemconfig(idx, fg=self.muted_color)
+
+    def add_task(self):
+        title = self.task_entry.get().strip()
+        if not title:
+            messagebox.showwarning("هشدار", "لطفاً عنوان وظیفه را وارد کنید.")
+            return
+        self.tasks.append({"title": title, "completed": False})
+        self.save_tasks()
+        self.task_entry.delete(0, tk.END)
+        self.refresh_listbox()
+
+    def toggle_task(self):
+        selected = self.task_listbox.curselection()
+        if not selected:
+            messagebox.showinfo("راهنما", "لطفاً یک وظیفه را از لیست انتخاب کنید.")
+            return
+        idx = selected[0]
+        self.tasks[idx]["completed"] = not self.tasks[idx]["completed"]
+        self.save_tasks()
+        self.refresh_listbox()
+
+    def delete_task(self):
+        selected = self.task_listbox.curselection()
+        if not selected:
+            messagebox.showinfo("راهنما", "لطفاً وظیفه‌ای که می‌خواهید حذف شود را انتخاب کنید.")
+            return
+        idx = selected[0]
+        del self.tasks[idx]
+        self.save_tasks()
+        self.refresh_listbox()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TaskManagerApp(root)
+    root.mainloop()
